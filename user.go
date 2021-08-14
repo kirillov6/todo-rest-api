@@ -8,7 +8,7 @@ type (
 		Password string `json:"password"`
 	}
 
-	UserLists struct {
+	UsersLists struct {
 		Id     int
 		UserId int
 		ListId int
