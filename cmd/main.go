@@ -33,8 +33,8 @@ func main() {
 	servs := services.NewServices(repo)
 	handler := handler.NewHandler(servs)
 
-	serv := new(todo.Server)
-	if err := serv.Run(viper.GetString("PORT"), handler.InitRoutes()); err != nil {
+	server := new(todo.Server)
+	if err := server.Run(viper.GetString("PORT"), handler.InitRoutes()); err != nil {
 		log.Fatalf("error while running http server: %s", err.Error())
 	}
 }
