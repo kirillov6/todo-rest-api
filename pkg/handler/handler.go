@@ -1,8 +1,15 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kirillov6/todo-rest-api/pkg/services"
+)
+
+const (
+	listIdParamKey = "list_id"
+	itemIdParamKey = "item_id"
 )
 
 type Handler struct {
@@ -28,18 +35,22 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			lists.GET("/", h.getLists)
 			lists.POST("/", h.createList)
-			lists.GET("/:list_id", h.getList)
-			lists.PUT("/:list_id", h.updateList)
-			lists.DELETE("/:list_id", h.deleteList)
-		}
 
-		items := lists.Group(":list_id/items")
-		{
-			items.GET("/", h.getItems)
-			items.POST("/", h.createItem)
-			items.GET("/:item_id", h.getItem)
-			items.PUT("/:item_id", h.updateItem)
-			items.DELETE("/:item_id", h.deleteItem)
+			listIdPath := fmt.Sprintf("/:%s", listIdParamKey)
+			lists.GET(listIdPath, h.getList)
+			lists.PUT(listIdPath, h.updateList)
+			lists.DELETE(listIdPath, h.deleteList)
+
+			items := lists.Group(":list_id/items")
+			{
+				items.GET("/", h.getItems)
+				items.POST("/", h.createItem)
+
+				itemIdPath := fmt.Sprintf("/:%s", itemIdParamKey)
+				items.GET(itemIdPath, h.getItem)
+				items.PUT(itemIdPath, h.updateItem)
+				items.DELETE(itemIdPath, h.deleteItem)
+			}
 		}
 	}
 
