@@ -45,12 +45,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				items.GET("/", h.getItems)
 				items.POST("/", h.createItem)
-
-				itemIdPath := fmt.Sprintf("/:%s", itemIdParamKey)
-				items.GET(itemIdPath, h.getItem)
-				items.PUT(itemIdPath, h.updateItem)
-				items.DELETE(itemIdPath, h.deleteItem)
 			}
+		}
+
+		items := api.Group("/items")
+		{
+			itemIdPath := fmt.Sprintf("/:%s", itemIdParamKey)
+			items.GET(itemIdPath, h.getItem)
+			items.PUT(itemIdPath, h.updateItem)
+			items.DELETE(itemIdPath, h.deleteItem)
 		}
 	}
 
