@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/kirillov6/todo-rest-api"
 	"github.com/kirillov6/todo-rest-api/pkg/handler"
@@ -34,9 +38,28 @@ func main() {
 	handler := handler.NewHandler(servs)
 
 	server := new(todo.Server)
-	if err := server.Run(viper.GetString("PORT"), handler.InitRoutes()); err != nil {
-		log.Fatalf("error while running http server: %s", err.Error())
+
+	go func() {
+		if err := server.Run(viper.GetString("PORT"), handler.InitRoutes()); err != nil {
+			log.Fatalf("error while running http server: %s", err.Error())
+		}
+	}()
+
+	log.Print("Server started")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		log.Fatalf("error while shutting down server: %s", err.Error())
 	}
+
+	if err := db.Close(); err != nil {
+		log.Fatalf("error while closing db connection: %s", err.Error())
+	}
+
+	log.Print("Server shutdown")
 }
 
 func initCfg() error {
